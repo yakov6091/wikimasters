@@ -1,24 +1,24 @@
 import WikiArticleViewer from "@/components/wiki-article-viewer";
 
 interface ViewArticlePageProps {
-    params: Promise<{
-        id: string;
-    }>;
+  params: Promise<{
+    id: string;
+  }>;
 }
 
 export default async function ViewArticlePage({
-    params,
+  params,
 }: ViewArticlePageProps) {
-    const { id } = await params;
+  const { id } = await params;
 
-    // Mock permission check - in a real app, this would come from auth/user context
-    const canEdit = true; // Set to true for demonstration
+  // Mock permission check - in a real app, this would come from auth/user context
+  const canEdit = true; // Set to true for demonstration
 
-    // Mock article data - in a real app, this would be fetched from an API
-    const mockArticle = {
-        id: +id,
-        title: "Welcome to WikiFlow",
-        content: `# Getting Started with WikiFlow
+  // Mock article data - in a real app, this would be fetched from an API
+  const mockArticle = {
+    id: +id,
+    title: "Welcome to WikiFlow",
+    content: `# Getting Started with WikiFlow
 
 Welcome to your personal wiki system! This is a comprehensive guide to help you understand how to use WikiFlow effectively.
 
@@ -101,10 +101,10 @@ Images can be embedded directly in your articles and will be displayed beautiful
 If you encounter any issues or have questions about using WikiFlow, don't hesitate to reach out to our support team or check the documentation.
 
 Happy writing! 🚀`,
-        author: "Admin User",
-        createdAt: "2024-01-15",
-        imageUrl: "/placeholder-image.svg", // Using SVG placeholder for demonstration
-    };
+    author: "Admin User",
+    createdAt: "2024-01-15",
+    imageUrl: "/placeholder-image.svg", // Using SVG placeholder for demonstration
+  };
 
-    return <WikiArticleViewer article={mockArticle} canEdit={canEdit} />;
+  return <WikiArticleViewer article={mockArticle} canEdit={canEdit} />;
 }
