@@ -1,5 +1,6 @@
 "use server";
 
+import { stackServerApp } from "@/stack/server";
 import { redirect } from "next/navigation";
 
 export type CreateArticleInput = {
@@ -16,19 +17,34 @@ export type UpdateArticleInput = {
 };
 
 export async function createArticle(data: CreateArticleInput) {
-  // TODO: Replace with actual database call
+  const user = await stackServerApp.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
   console.log("✨ createArticle called:", data);
   return { success: true, message: "Article create logged (stub)" };
 }
 
 export async function updateArticle(id: string, data: UpdateArticleInput) {
-  // TODO: Replace with actual database update
-  console.log("📝 updateArticle called:", { id, ...data });
+  const user = await stackServerApp.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
+
+  const authorId = user.id;
+
+  console.log("📝 updateArticle called:", authorId, data);
   return { success: true, message: `Article ${id} update logged (stub)` };
 }
 
 export async function deleteArticle(id: string) {
-  // TODO: Replace with actual database delete
+  const user = await stackServerApp.getUser();
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
+
+  const authorId = user.id;
+
   console.log("🗑️ deleteArticle called:", id);
   return { success: true, message: `Article ${id} delete logged (stub)` };
 }

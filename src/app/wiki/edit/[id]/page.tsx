@@ -1,4 +1,7 @@
 import WikiEditor from "@/components/wiki-editor";
+import { stackServerApp } from "@/stack/server";
+import { StackServerApp } from "@stackframe/stack";
+import { redirect } from "next/dist/server/api-utils";
 
 interface EditArticlePageProps {
   params: Promise<{
@@ -9,6 +12,7 @@ interface EditArticlePageProps {
 export default async function EditArticlePage({
   params,
 }: EditArticlePageProps) {
+  await stackServerApp.getUser({ or: 'redirect' });
   const { id } = await params;
 
   // In a real app, you would fetch the article data here
@@ -16,8 +20,8 @@ export default async function EditArticlePage({
   const mockData =
     id !== "new"
       ? {
-          title: `Sample Article ${id}`,
-          content: `# Sample Article ${id}
+        title: `Sample Article ${id}`,
+        content: `# Sample Article ${id}
 
 This is some sample markdown content for article ${id}.
 
@@ -32,7 +36,7 @@ console.log("Hello from article ${id}");
 \`\`\`
 
 This would normally be fetched from your API.`,
-        }
+      }
       : {};
 
   return (
