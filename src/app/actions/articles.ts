@@ -1,6 +1,10 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { stackServerApp } from "@/stack/server";
+import { authorizeUserToEditArticle } from "@/db/authz";
+import db from "@/db"
+import { articles } from "@/db/schema";
 import { redirect } from "next/navigation";
 
 export type CreateArticleInput = {
@@ -21,7 +25,16 @@ export async function createArticle(data: CreateArticleInput) {
   if (!user) {
     throw new Error('Unauthorized');
   }
+
   console.log("✨ createArticle called:", data);
+
+  await db.insert(articles).values({
+    title: data.title,
+    content: data.content,
+    slug: '' + Date.now(),
+    published: true,
+    authorId: user.id
+  })
   return { success: true, message: "Article create logged (stub)" };
 }
 
@@ -31,9 +44,18 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
     throw new Error('Unauthorized');
   }
 
-  const authorId = user.id;
+  if (!(await authorizeUserToEditArticle(user.id, Number(id)))) {
+    throw new Error('Forbidden');
+  }
 
+  const authorId = user.id;
   console.log("📝 updateArticle called:", authorId, data);
+
+  await db.update(articles).set({
+    title: data.title,
+    content: data.content
+  }).where(eq(articles.id, Number(id)));
+
   return { success: true, message: `Article ${id} update logged (stub)` };
 }
 
@@ -43,9 +65,15 @@ export async function deleteArticle(id: string) {
     throw new Error('Unauthorized');
   }
 
-  const authorId = user.id;
+  if (!(await authorizeUserToEditArticle(user.id, Number(id)))) {
+    throw new Error('Forbiden');
+  }
 
-  console.log("🗑️ deleteArticle called:", id);
+  const authorId = user.id;
+  console.log("🗑️ deleteArticle called:", authorId);
+
+  await db.delete(articles).where(eq(articles.id, Number(id)))
+
   return { success: true, message: `Article ${id} delete logged (stub)` };
 }
 
