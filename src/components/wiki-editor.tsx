@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-
 interface WikiEditorProps {
   initialTitle?: string;
   initialContent?: string;
@@ -100,7 +99,8 @@ export default function WikiEditor({
 
     // In a real app, you would navigate after successful submission
     alert(
-      `Article ${isEditing ? "updated" : "created"
+      `Article ${
+        isEditing ? "updated" : "created"
       } successfully! Check console for form data.`,
     );
   };
@@ -163,8 +163,9 @@ export default function WikiEditor({
             <div className="space-y-2">
               <Label htmlFor="content">Content (Markdown) *</Label>
               <div
-                className={`border rounded-md ${errors.content ? "border-destructive" : ""
-                  }`}
+                className={`border rounded-md ${
+                  errors.content ? "border-destructive" : ""
+                }`}
               >
                 <MDEditor
                   value={content}
