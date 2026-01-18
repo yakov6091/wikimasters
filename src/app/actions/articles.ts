@@ -4,9 +4,9 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import db from "@/db";
 import { authorizeUserToEditArticle } from "@/db/authz";
+import { ensureUserExists } from "@/db/ensureUserExists";
 import { articles } from "@/db/schema";
 import { stackServerApp } from "@/stack/server";
-import { ensureUserExists } from "@/db/ensureUserExists";
 
 export type CreateArticleInput = {
   title: string;
@@ -44,7 +44,7 @@ export async function createArticle(data: CreateArticleInput) {
     .returning({ id: articles.id });
 
   const articleId = response[0]?.id;
-  return { success: true, message: 'Article create logged', id: articleId };
+  return { success: true, message: "Article create logged", id: articleId };
 }
 
 // Update Article

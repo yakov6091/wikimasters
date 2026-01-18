@@ -15,7 +15,7 @@ export type UploadedFile = {
 export async function uploadFile(formData: FormData): Promise<UploadedFile> {
   const user = stackServerApp.getUser();
   if (!user) {
-    throw new Error('Unauthorized');
+    throw new Error("Unauthorized");
   }
 
   // Basic validation constants
