@@ -11,10 +11,11 @@ CREATE TABLE "articles" (
 	CONSTRAINT "articles_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
-CREATE TABLE "usersSync" (
+CREATE TABLE "users_sync" (
 	"id" text PRIMARY KEY NOT NULL,
+	"email" text NOT NULL,
 	"name" text,
-	"email" text
+	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_usersSync_id_fk" FOREIGN KEY ("author_id") REFERENCES "public"."usersSync"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_users_sync_id_fk" FOREIGN KEY ("author_id") REFERENCES "public"."users_sync"("id") ON DELETE no action ON UPDATE no action;

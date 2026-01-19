@@ -48,18 +48,18 @@ export async function uploadFile(formData: FormData): Promise<UploadedFile> {
   try {
     const blob = await put(file.name, file, {
       access: "public",
-      addRandomSuffix: true
+      addRandomSuffix: true,
     });
 
     return {
       url: blob.url ?? "",
       size: file.size,
       type: file.type,
-      filename: blob.pathname ?? file.name
+      filename: blob.pathname ?? file.name,
     };
   } catch (error) {
-    console.error('Vercel Blob upload error', error);
-    throw new Error('Upload fail');
+    console.error("Vercel Blob upload error", error);
+    throw new Error("Upload fail");
   }
 
   // Return mock file info for now

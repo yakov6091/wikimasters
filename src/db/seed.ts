@@ -1,5 +1,5 @@
 import { seed } from "drizzle-seed";
-import db, { sql } from "@/db/index";
+import db, { sql } from "@/db";
 import { articles, usersSync } from "@/db/schema";
 
 const SEED_COUNT = 25;
@@ -9,38 +9,38 @@ async function main() {
   try {
     console.log(`🌱 Starting DB seed with seed ${SEED}...`);
 
-    console.log("🧹 Truncating articles table and restarting identity...");
-    // Use TRUNCATE + RESTART IDENTITY so sequences are reset to match an empty table.
-    // This is simpler and avoids needing to call setval later.
+    console.log("🧹 Truncating articles table...");
     await sql.query("TRUNCATE TABLE articles RESTART IDENTITY CASCADE;");
 
-    console.log("🔎 Querying existing users...");
-    let users = await db
+    console.log("👤 Fetching existing Stack Auth users from usersSync...");
+    const users = await db
       .select({ id: usersSync.id })
       .from(usersSync)
       .orderBy(usersSync.id);
 
     if (users.length === 0) {
-      console.log("👤 No users found, inserting default seed user...");
-      await db.insert(usersSync).values({
-        id: "seed-user-001",
-        name: "Seed User",
-        email: "seed@example.com",
-      });
-      users = [{ id: "seed-user-001" }];
+      console.error(
+        "❌ No users found in usersSync.\n" +
+        "👉 Log in via Stack Auth first so real users are synced.\n" +
+        "👉 Then run the seed again.",
+      );
+      process.exit(1);
     }
 
-    const ids = users.map((user) => user.id);
-    console.log(`👥 Using ${users.length} user(s)`);
+    const userIds = users.map((u) => u.id);
+    console.log(`👥 Found ${userIds.length} real user(s)`);
 
-    console.log("🍩 Using drizzle-seed...");
+    console.log("🍩 Seeding articles...");
     await seed(db, { articles }, { seed: SEED }).refine((funcs) => ({
       articles: {
         count: SEED_COUNT,
         columns: {
           authorId: funcs.valuesFromArray({
-            values: ids,
+            values: userIds,
             isUnique: false,
+          }),
+          title: funcs.loremIpsum({
+            sentencesCount: 1,
           }),
           content: funcs.valuesFromArray({
             values: [
@@ -57,33 +57,27 @@ async function main() {
             ],
             isUnique: false,
           }),
-          title: funcs.loremIpsum({
-            sentencesCount: 1,
-          }),
           imageUrl: funcs.default({ defaultValue: null }),
           published: funcs.default({ defaultValue: true }),
+          slug: funcs.string({ isUnique: true }),
         },
-        updatedAt: funcs.timestamp(),
         createdAt: funcs.timestamp(),
-        slug: funcs.string({
-          isUnique: true,
-        }),
+        updatedAt: funcs.timestamp(),
       },
     }));
 
-    console.log(`✅ Inserted ${SEED_COUNT} article(s) into the database\n`);
+    console.log(`✅ Inserted ${SEED_COUNT} articles`);
 
-    // Ensure the articles sequence is synced to the current MAX(id). This is a
-    // safety measure in case the DB was imported or mutated in a way that left
-    // the sequence behind the table's max value.
-    try {
-      await sql.query(
-        `SELECT setval(pg_get_serial_sequence('articles','id'), COALESCE((SELECT MAX(id) FROM articles), 1), true);`,
+    console.log("🔁 Syncing articles ID sequence...");
+    await sql.query(`
+      SELECT setval(
+        pg_get_serial_sequence('articles','id'),
+        COALESCE((SELECT MAX(id) FROM articles), 1),
+        true
       );
-      console.log("✅ Sequence synced after seeding");
-    } catch (err) {
-      console.warn("⚠️ Failed to sync articles sequence after seeding:", err);
-    }
+    `);
+
+    console.log("🎉 Seeding completed successfully!");
   } catch (err) {
     console.error("💥 Seed failed:", err);
     process.exit(1);

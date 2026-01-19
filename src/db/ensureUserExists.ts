@@ -16,14 +16,14 @@ export async function ensureUserExists(stackUser: StackUser): Promise<void> {
     .insert(usersSync)
     .values({
       id: stackUser.id,
-      name: stackUser.displayName,
-      email: stackUser.primaryEmail,
+      name: stackUser.displayName ?? 'Unknown',
+      email: stackUser.primaryEmail ?? '',
     })
     .onConflictDoUpdate({
       target: usersSync.id,
       set: {
-        name: stackUser.displayName,
-        email: stackUser.primaryEmail,
+        name: stackUser.displayName ?? 'Unknown',
+        email: stackUser.primaryEmail ?? '',
       },
     });
 }

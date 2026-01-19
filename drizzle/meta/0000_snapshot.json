@@ -1,5 +1,5 @@
 {
-  "id": "9d92defb-5592-4564-a21f-546ae1950800",
+  "id": "849dceac-18aa-441d-a0f6-c8b8d6af877a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -68,12 +68,16 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "articles_author_id_usersSync_id_fk": {
-          "name": "articles_author_id_usersSync_id_fk",
+        "articles_author_id_users_sync_id_fk": {
+          "name": "articles_author_id_users_sync_id_fk",
           "tableFrom": "articles",
-          "tableTo": "usersSync",
-          "columnsFrom": ["author_id"],
-          "columnsTo": ["id"],
+          "tableTo": "users_sync",
+          "columnsFrom": [
+            "author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -83,15 +87,17 @@
         "articles_slug_unique": {
           "name": "articles_slug_unique",
           "nullsNotDistinct": false,
-          "columns": ["slug"]
+          "columns": [
+            "slug"
+          ]
         }
       },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.usersSync": {
-      "name": "usersSync",
+    "public.users_sync": {
+      "name": "users_sync",
       "schema": "",
       "columns": {
         "id": {
@@ -100,17 +106,24 @@
           "primaryKey": true,
           "notNull": true
         },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "name": {
           "name": "name",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "email": {
-          "name": "email",
-          "type": "text",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},

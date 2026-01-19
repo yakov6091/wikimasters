@@ -20,10 +20,13 @@ export default schema;
 export type Article = typeof articles.$inferSelect;
 export type NewArticle = typeof articles.$inferInsert;
 
-export const usersSync = pgTable("usersSync", {
-  id: text("id").primaryKey(), // Stack Auth user ID
+export const usersSync = pgTable("users_sync", {
+  id: text("id").primaryKey(), // Stack Auth user id (string)
+
+  email: text("email").notNull(),
   name: text("name"),
-  email: text("email"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type User = typeof usersSync.$inferSelect;
