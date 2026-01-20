@@ -72,12 +72,8 @@
           "name": "articles_author_id_users_sync_id_fk",
           "tableFrom": "articles",
           "tableTo": "users_sync",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -87,9 +83,7 @@
         "articles_slug_unique": {
           "name": "articles_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},

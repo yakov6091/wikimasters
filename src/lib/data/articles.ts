@@ -1,8 +1,24 @@
 import { eq } from "drizzle-orm";
+import redis from "@/cache";
 import db from "@/db/index";
 import { articles, usersSync } from "@/db/schema";
 
-export async function getArticles() {
+export type ArticleList = {
+  id: number;
+  title: string;
+  createdAt: string;
+  content: string;
+  author: string | null;
+  imageUrl?: string | null;
+};
+
+export async function getArticles(): Promise<ArticleList[]> {
+  const cached = await redis.get<ArticleList[]>('articles:all');
+  if (cached) {
+    console.log('Get articles cache hit');
+    return cached;
+  }
+
   const response = await db
     .select({
       title: articles.title,
@@ -13,7 +29,16 @@ export async function getArticles() {
     })
     .from(articles)
     .leftJoin(usersSync, eq(articles.authorId, usersSync.id)); // eq = equal
-  return response;
+
+  console.log('Get articles cache miss');
+  try {
+    redis.set('articles:all', JSON.stringify(response), {
+      ex: 60
+    });
+  } catch (error) {
+    console.warn("Failed to set articles cache", error);
+  }
+  return response as unknown as ArticleList[];
 }
 
 export async function getArticleById(id: number) {

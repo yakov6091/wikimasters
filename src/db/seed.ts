@@ -21,8 +21,8 @@ async function main() {
     if (users.length === 0) {
       console.error(
         "❌ No users found in usersSync.\n" +
-        "👉 Log in via Stack Auth first so real users are synced.\n" +
-        "👉 Then run the seed again.",
+          "👉 Log in via Stack Auth first so real users are synced.\n" +
+          "👉 Then run the seed again.",
       );
       process.exit(1);
     }

@@ -13,7 +13,7 @@ export default async function EditArticlePage({
   params,
 }: EditArticlePageProps) {
   const { id } = await params;
-  const user = await stackServerApp.getUser({ or: "redirect" });
+  const _user = await stackServerApp.getUser({ or: "redirect" });
 
   // we'll uncomment this later when the articles have real IDs
   // if (user.id !== id) {

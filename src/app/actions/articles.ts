@@ -7,6 +7,8 @@ import { authorizeUserToEditArticle } from "@/db/authz";
 import { ensureUserExists } from "@/db/ensureUserExists";
 import { articles } from "@/db/schema";
 import { stackServerApp } from "@/stack/server";
+import { Redis } from "@upstash/redis";
+import redis from "@/cache";
 
 export type CreateArticleInput = {
   title: string;
@@ -40,8 +42,11 @@ export async function createArticle(data: CreateArticleInput) {
       slug: `${Date.now()}`,
       published: true,
       authorId: user.id,
+      imageUrl: data.imageUrl ?? undefined
     })
     .returning({ id: articles.id });
+
+  redis.del('articles:all');
 
   const articleId = response[0]?.id;
   return { success: true, message: "Article create logged", id: articleId };
