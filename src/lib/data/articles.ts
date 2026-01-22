@@ -13,9 +13,9 @@ export type ArticleList = {
 };
 
 export async function getArticles(): Promise<ArticleList[]> {
-  const cached = await redis.get<ArticleList[]>('articles:all');
+  const cached = await redis.get<ArticleList[]>("articles:all");
   if (cached) {
-    console.log('Get articles cache hit');
+    console.log("Get articles cache hit");
     return cached;
   }
 
@@ -30,10 +30,10 @@ export async function getArticles(): Promise<ArticleList[]> {
     .from(articles)
     .leftJoin(usersSync, eq(articles.authorId, usersSync.id)); // eq = equal
 
-  console.log('Get articles cache miss');
+  console.log("Get articles cache miss");
   try {
-    redis.set('articles:all', JSON.stringify(response), {
-      ex: 60
+    redis.set("articles:all", JSON.stringify(response), {
+      ex: 60,
     });
   } catch (error) {
     console.warn("Failed to set articles cache", error);

@@ -5,19 +5,19 @@ import { Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
+import { createArticle, updateArticle } from "@/app/actions/articles";
+import { uploadFile } from "@/app/actions/upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { uploadFile } from "@/app/actions/upload";
-import { createArticle, updateArticle } from "@/app/actions/articles";
 
 interface WikiEditorProps {
   initialTitle?: string;
   initialContent?: string;
   isEditing?: boolean;
   articleId?: string;
-  userId?: string
+  userId?: string;
 }
 
 interface FormData {
@@ -36,7 +36,7 @@ export default function WikiEditor({
   initialContent = "",
   isEditing = false,
   articleId,
-  userId = 'user-1'
+  userId = "user-1",
 }: WikiEditorProps) {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
@@ -91,8 +91,8 @@ export default function WikiEditor({
       // If there's at least one file, upload the first one via server action
       if (files.length > 0) {
         const fd = new FormData();
-        fd.append('files', files[0]);
-        // uploadFile is a server action imported 
+        fd.append("files", files[0]);
+        // uploadFile is a server action imported
         const uploaded = await uploadFile(fd);
         imageUrl = uploaded?.url;
       }
@@ -107,21 +107,19 @@ export default function WikiEditor({
       if (isEditing && articleId) {
         await updateArticle(articleId, payload);
         // Redirect to article page after successful upd
-        router.push(`/wiki/${articleId}`)
+        router.push(`/wiki/${articleId}`);
       } else {
         const result = await createArticle(payload);
         // Redirect to article page after successful create
         if (result.id) {
           router.push(`/wiki/${result.id}`);
         } else {
-          router.push('/');
+          router.push("/");
         }
       }
-
     } catch (error) {
-      console.error('Error submitting article:', error);
-      alert('Failed to submit article');
-
+      console.error("Error submitting article:", error);
+      alert("Failed to submit article");
     } finally {
       setIsSubmitting(false);
     }
@@ -161,6 +159,7 @@ export default function WikiEditor({
     if (shouldLeave) {
       console.log("User cancelled editing");
       // navigation logic would go here
+      router.push("/");
     }
   };
 
@@ -210,8 +209,9 @@ export default function WikiEditor({
             <div className="space-y-2">
               <Label htmlFor="content">Content (Markdown) *</Label>
               <div
-                className={`border rounded-md ${errors.content ? "border-destructive" : ""
-                  }`}
+                className={`border rounded-md ${
+                  errors.content ? "border-destructive" : ""
+                }`}
               >
                 <MDEditor
                   value={content}
