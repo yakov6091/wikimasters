@@ -8,6 +8,13 @@
       "when": 1768824460630,
       "tag": "0000_mushy_payback",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769087525551,
+      "tag": "0001_slim_mac_gargan",
+      "breakpoints": true
     }
   ]
 }

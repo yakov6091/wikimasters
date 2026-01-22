@@ -3,7 +3,7 @@
 import redis from "@/cache";
 import sendCelebrationEmail from "@/email/celebration-email";
 
-const milestones = [5, 10, 11, 12, 20, 25, 50, 100, 1000];
+const milestones = [10, 20, 25, 50, 100, 1000];
 
 const keyFor = (id: number) => `pageviews:article${id}`;
 

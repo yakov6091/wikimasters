@@ -8,6 +8,7 @@ import { authorizeUserToEditArticle } from "@/db/authz";
 import { ensureUserExists } from "@/db/ensureUserExists";
 import { articles } from "@/db/schema";
 import { stackServerApp } from "@/stack/server";
+import { summarizeArticle } from "@/ai/summarize";
 
 export type CreateArticleInput = {
   title: string;
@@ -33,6 +34,8 @@ export async function createArticle(data: CreateArticleInput) {
 
   console.log("✨ createArticle called:", data);
 
+  const summary = await summarizeArticle(data.title || '', data.content || '');
+
   const response = await db
     .insert(articles)
     .values({
@@ -42,6 +45,7 @@ export async function createArticle(data: CreateArticleInput) {
       published: true,
       authorId: user.id,
       imageUrl: data.imageUrl ?? undefined,
+      summary: summary ?? undefined
     })
     .returning({ id: articles.id });
 
@@ -65,12 +69,15 @@ export async function updateArticle(id: string, data: UpdateArticleInput) {
   const authorId = user.id;
   console.log("📝 updateArticle called:", authorId, data);
 
+  const summary = await summarizeArticle(data.title || '', data.content || '');
+
   await db
     .update(articles)
     .set({
       title: data.title,
       content: data.content,
       imageUrl: data.imageUrl ?? undefined,
+      summary: summary ?? undefined
     })
     .where(eq(articles.id, Number(id)));
 

@@ -20,12 +20,6 @@ interface WikiEditorProps {
   userId?: string;
 }
 
-interface FormData {
-  title: string;
-  content: string;
-  files: File[];
-}
-
 interface FormErrors {
   title?: string;
   content?: string;
@@ -75,13 +69,12 @@ export default function WikiEditor({
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle form submission
+  // Handle form submission using Server Actions
+  // We import server actions and call them from the client component.
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setIsSubmitting(true);
 
@@ -92,7 +85,7 @@ export default function WikiEditor({
       if (files.length > 0) {
         const fd = new FormData();
         fd.append("files", files[0]);
-        // uploadFile is a server action imported
+        // uploadFile is a server action imported below
         const uploaded = await uploadFile(fd);
         imageUrl = uploaded?.url;
       }
@@ -106,7 +99,7 @@ export default function WikiEditor({
 
       if (isEditing && articleId) {
         await updateArticle(articleId, payload);
-        // Redirect to article page after successful upd
+        // Redirect to article page after successful update
         router.push(`/wiki/${articleId}`);
       } else {
         const result = await createArticle(payload);
@@ -117,37 +110,12 @@ export default function WikiEditor({
           router.push("/");
         }
       }
-    } catch (error) {
-      console.error("Error submitting article:", error);
+    } catch (err) {
+      console.error("Error submitting article:", err);
       alert("Failed to submit article");
     } finally {
       setIsSubmitting(false);
     }
-
-    // const formData: FormData = {
-    //   title: title.trim(),
-    //   content: content.trim(),
-    //   files,
-    // };
-
-    // Log the form data (as requested - no actual API calls)
-    // console.log("Form submitted:", {
-    //   action: isEditing ? "edit" : "create",
-    //   articleId: isEditing ? articleId : undefined,
-    //   data: formData,
-    // });
-
-    // Simulate API call delay
-    // await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // setIsSubmitting(false);
-
-    // In a real app, you would navigate after successful submission
-    // alert(
-    //   `Article ${
-    //     isEditing ? "updated" : "created"
-    //   } successfully! Check console for form data.`,
-    // );
   };
 
   // Handle cancel
@@ -159,7 +127,6 @@ export default function WikiEditor({
     if (shouldLeave) {
       console.log("User cancelled editing");
       // navigation logic would go here
-      router.push("/");
     }
   };
 
@@ -187,6 +154,7 @@ export default function WikiEditor({
               <Label htmlFor="title">Title *</Label>
               <Input
                 id="title"
+                name="title"
                 type="text"
                 placeholder="Enter article title..."
                 value={title}
@@ -209,9 +177,8 @@ export default function WikiEditor({
             <div className="space-y-2">
               <Label htmlFor="content">Content (Markdown) *</Label>
               <div
-                className={`border rounded-md ${
-                  errors.content ? "border-destructive" : ""
-                }`}
+                className={`border rounded-md ${errors.content ? "border-destructive" : ""
+                  }`}
               >
                 <MDEditor
                   value={content}
@@ -220,8 +187,15 @@ export default function WikiEditor({
                   hideToolbar={false}
                   visibleDragbar={false}
                   textareaProps={{
+                    name: "content",
                     placeholder: "Write your article content in Markdown...",
                     style: { fontSize: 14, lineHeight: 1.5 },
+                    // make these explicit so SSR and client output match exactly
+                    // server-rendered HTML used autoCapitalize="none" — keep that value
+                    autoCapitalize: "none",
+                    autoComplete: "off",
+                    autoCorrect: "off",
+                    spellCheck: false,
                   }}
                 />
               </div>
@@ -308,13 +282,14 @@ export default function WikiEditor({
                 variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
+                className="cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="min-w-[100px]"
+                className="min-w-[100px] cursor-pointer"
               >
                 {isSubmitting ? "Saving..." : "Save Article"}
               </Button>

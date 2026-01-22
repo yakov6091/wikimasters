@@ -38,7 +38,7 @@ export default function WikiArticleViewer({
   article,
   canEdit = false,
 }: WikiArticleViewerProps) {
-  const [localPageviews, setLocalPageviews] = useState(0);
+  const [localPageviews, setLocalPageviews] = useState<number | null>(null);
 
   // Format date for display
   const formatDate = (dateString: string) => {
